@@ -123,6 +123,38 @@ sudo -u postgres psql -d jerney_db  # Connect to database
 - Node.js 20+
 - PostgreSQL 16+
 
+### 🍎 macOS Setup
+
+On macOS you don't need any of the EC2 steps (scp, SSH, `deploy/setup.sh`, Nginx, PM2) — the Vite dev server serves the frontend and proxies `/api` to the backend directly.
+
+#### 1. Install Node.js and PostgreSQL via Homebrew
+
+```bash
+brew install node postgresql@16
+brew services start postgresql@16
+```
+
+#### 2. Create the database and user
+
+This replicates the only part of `deploy/setup.sh` you need locally:
+
+```bash
+psql postgres <<EOF
+CREATE USER jerney_user WITH PASSWORD 'jerney_pass_2026';
+CREATE DATABASE jerney_db OWNER jerney_user;
+GRANT ALL PRIVILEGES ON DATABASE jerney_db TO jerney_user;
+EOF
+```
+
+> [!NOTE]
+> Homebrew PostgreSQL connects as your Mac user — there is no `postgres` system user like on Ubuntu, so skip the `sudo -u postgres` commands shown in the EC2 section. To connect to the database locally, just run `psql -d jerney_db`.
+
+You don't need to create any tables — the backend creates them automatically on startup.
+
+#### 3. Run the backend and frontend
+
+Follow the [Backend](#backend) and [Frontend](#frontend) steps below, then open `http://localhost:3000`.
+
 ### Backend
 
 ```bash
