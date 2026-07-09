@@ -16,3 +16,6 @@ terraform/crash.log
 # OS
 .DS_Store
 Thumbs.db
+
+# Local minikube manifest (local dev only, not for remote)
+k8s/jerney-minikube.yaml
