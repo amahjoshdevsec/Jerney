@@ -7,10 +7,14 @@ COPY . .
 RUN npm run build
 
 # ---- Production stage ----
-FROM nginx:1.27-alpine AS production
+FROM nginx:1.29-alpine AS production
 
-# Security: remove default nginx config
-RUN rm -rf /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*
+# Security: pull patched Alpine packages — the base image tag lags behind
+# published CVE fixes (openssl, libexpat, c-ares, ...), and remove default
+# nginx config
+# hadolint ignore=DL3017
+RUN apk upgrade --no-cache \
+    && rm -rf /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*
 
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf

@@ -7,11 +7,12 @@ RUN npm ci --only=production && npm cache clean --force
 # ---- Production stage ----
 FROM node:26-alpine AS production
 
-# Security: run as non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
-# Security: remove unnecessary packages
-RUN apk add --no-cache dumb-init=1.2.5-r4
+# Security: non-root user, pinned dumb-init, and remove the bundled npm CLI —
+# npm is not needed at runtime and its vendored deps (e.g. undici) show up in
+# vulnerability scans
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
+    && apk add --no-cache dumb-init=1.2.5-r4 \
+    && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 WORKDIR /app
 
